@@ -1,6 +1,9 @@
 import {
     appendClearedSessionCookies,
+    appendDevSessionCookie,
     appendSessionCookies,
+    authenticateDevCredentials,
+    isDevAuthEnabled,
     isUserAllowed,
     jsonResponse,
     requireConfiguration,
@@ -26,6 +29,22 @@ function authenticatedResponse(request, session, rememberMe) {
     }), { status: 200, headers });
 }
 
+async function developmentAuthenticatedResponse(request, user, env, rememberMe) {
+    const headers = new Headers({
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, max-age=0",
+        Pragma: "no-cache"
+    });
+
+    appendClearedSessionCookies(headers, request);
+    await appendDevSessionCookie(headers, request, user, env, rememberMe);
+
+    return new Response(JSON.stringify({
+        authenticated: true,
+        user
+    }), { status: 200, headers });
+}
+
 function deniedResponse(request, status = 401) {
     const headers = new Headers({
         "Content-Type": "application/json; charset=utf-8",
@@ -45,14 +64,6 @@ export async function onRequestPost(context) {
 
     if (!validateRequestOrigin(request, env)) {
         return jsonResponse({ authenticated: false, message: "Request origin rejected." }, 403);
-    }
-
-    const configuration = requireConfiguration(env);
-    if (!configuration) {
-        return jsonResponse({
-            authenticated: false,
-            message: "Authentication service is not configured."
-        }, 503);
     }
 
     const contentType = request.headers.get("Content-Type") || "";
@@ -80,6 +91,21 @@ export async function onRequestPost(context) {
     const allowedDomain = String(env.PAYROLL_ALLOWED_EMAIL_DOMAIN || "").trim().toLowerCase();
     if (allowedDomain && !email.endsWith(`@${allowedDomain}`)) {
         return deniedResponse(request);
+    }
+
+    const developmentUser = authenticateDevCredentials(email, password, env);
+    if (developmentUser) {
+        return developmentAuthenticatedResponse(request, developmentUser, env, rememberMe);
+    }
+
+    const configuration = requireConfiguration(env);
+    if (!configuration) {
+        return isDevAuthEnabled(env)
+            ? deniedResponse(request)
+            : jsonResponse({
+                authenticated: false,
+                message: "Authentication service is not configured."
+            }, 503);
     }
 
     let authResponse;
