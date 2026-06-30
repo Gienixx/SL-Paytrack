@@ -1,10 +1,21 @@
 # Copy this file to .dev.vars for local Cloudflare Pages development.
 # Never commit the real .dev.vars file.
 
-SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+# DATABASE-FREE DEVELOPMENT LOGIN
+# Set your own private values before running the project.
+DEV_AUTH_ENABLED=true
+DEV_AUTH_EMAIL=admin@slpaytrack.local
+DEV_AUTH_PASSWORD=replace-with-a-private-password
+DEV_AUTH_SECRET=replace-with-at-least-32-random-characters
+DEV_AUTH_NAME=Development Admin
+DEV_AUTH_ROLE=admin
 
-# Optional production restrictions
+# SUPABASE AUTHENTICATION
+# Leave blank while using development login mode.
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+
+# Request and access restrictions
 PAYROLL_ALLOWED_ORIGIN=http://localhost:8788
 PAYROLL_ALLOWED_EMAIL_DOMAIN=
 PAYROLL_ALLOWED_ROLES=
