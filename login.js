@@ -112,7 +112,7 @@ passwordToggle.addEventListener("click", () => {
 });
 
 forgotPasswordButton.addEventListener("click", () => {
-    showAlert("Password recovery will be sent through the approved company recovery process once the authentication service is connected.", "info");
+    showAlert("Password recovery will be available after the production authentication service is connected.", "info");
 });
 
 emailInput.addEventListener("input", () => setFieldError(emailInput, emailError));
@@ -145,18 +145,24 @@ loginForm.addEventListener("submit", async (event) => {
             })
         });
 
+        let result = {};
+        try {
+            result = await response.json();
+        } catch {
+            result = {};
+        }
+
         if (response.status === 429) {
             showAlert("Too many sign-in attempts. Please wait before trying again.");
             return;
         }
 
-        if (!response.ok) {
-            showAlert("Unable to sign in with those credentials. Check your details and try again.");
+        if (response.status === 503) {
+            showAlert("Authentication is not configured. Add the DEV_AUTH variables or connect Supabase before signing in.");
             return;
         }
 
-        const result = await response.json();
-        if (result.authenticated !== true) {
+        if (!response.ok || result.authenticated !== true) {
             showAlert("Unable to sign in with those credentials. Check your details and try again.");
             return;
         }
@@ -166,7 +172,7 @@ loginForm.addEventListener("submit", async (event) => {
     } catch (error) {
         const message = error.name === "AbortError"
             ? "The authentication request timed out. Please try again."
-            : "The authentication service is not available yet. Connect the server endpoints before using payroll sign-in.";
+            : "The authentication service could not be reached. Run the site through Cloudflare Pages Functions and try again.";
         showAlert(message);
     } finally {
         submitButton.disabled = false;
