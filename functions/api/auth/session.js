@@ -1,7 +1,9 @@
 import {
     appendClearedSessionCookies,
     appendSessionCookies,
+    getDevSession,
     getSessionCookies,
+    isDevAuthEnabled,
     isUserAllowed,
     jsonResponse,
     requireConfiguration,
@@ -37,9 +39,24 @@ async function refreshSession(configuration, refreshToken) {
 
 export async function onRequestGet(context) {
     const { request, env } = context;
-    const configuration = requireConfiguration(env);
 
+    const developmentUser = await getDevSession(request, env);
+    if (developmentUser) {
+        return jsonResponse({
+            authenticated: true,
+            user: developmentUser,
+            developmentMode: true
+        });
+    }
+
+    const configuration = requireConfiguration(env);
     if (!configuration) {
+        if (isDevAuthEnabled(env)) {
+            return responseWithCookies(request, { authenticated: false }, 401, (headers) => {
+                appendClearedSessionCookies(headers, request);
+            });
+        }
+
         return jsonResponse({ authenticated: false, message: "Authentication service is not configured." }, 503);
     }
 
