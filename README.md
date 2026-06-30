@@ -4,7 +4,7 @@ A payroll and workforce management system for Social Loop employees.
 
 ## Current version
 
-The repository contains a responsive payroll dashboard and a dedicated authentication flow designed for Cloudflare Pages Functions and Supabase Auth.
+The repository contains a responsive payroll dashboard and a dedicated authentication flow designed for Cloudflare Pages Functions. It supports either a temporary database-free development account or Supabase Auth.
 
 All payroll values currently displayed are fictional sample data. Live payroll records have not yet been connected.
 
@@ -22,33 +22,79 @@ All payroll values currently displayed are fictional sample data. Live payroll r
 ### Authentication
 
 - Dedicated `login.html` payroll sign-in page
-- Email and password validation
-- Password visibility control
-- Server-side Supabase password authentication
+- Database-free development login mode
+- Server-side Supabase password authentication when configured
+- Signed development sessions that cannot be forged by editing browser storage
 - `HttpOnly`, `SameSite=Strict` session cookies
-- Automatic access-token validation and refresh
+- Automatic Supabase access-token validation and refresh
 - Fail-closed dashboard session verification
 - Server-side logout and cookie clearing
-- Optional allowed email-domain restriction
-- Optional role restriction using Supabase `app_metadata.role`
+- Optional email-domain and role restrictions
 - Browser security headers and disabled caching for login and dashboard HTML
 
-## Authentication architecture
+## Database-free development login
 
-The browser sends credentials to the same-origin `/api/auth/login` Cloudflare Pages Function. The function authenticates against Supabase and stores the returned session tokens in protected cookies. The dashboard calls `/api/auth/session` before displaying its interface.
+Random credentials are intentionally rejected. Define one private development account through environment variables.
 
-Passwords and tokens are not saved in `localStorage`, `sessionStorage`, or source files.
+### Local setup
 
-### Required Cloudflare environment variables
+Copy `.dev.vars.example` to `.dev.vars`:
 
-Configure these under the Cloudflare Pages project settings:
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .dev.vars.example .dev.vars
+```
+
+Edit `.dev.vars` and set private values:
+
+```text
+DEV_AUTH_ENABLED=true
+DEV_AUTH_EMAIL=your-email@example.com
+DEV_AUTH_PASSWORD=choose-a-private-password
+DEV_AUTH_SECRET=use-a-random-secret-with-at-least-32-characters
+DEV_AUTH_NAME=Zai
+DEV_AUTH_ROLE=admin
+
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+PAYROLL_ALLOWED_ORIGIN=http://localhost:8788
+```
+
+Start the Cloudflare Pages development server:
+
+```bash
+npx wrangler pages dev .
+```
+
+Open `/login.html` and sign in using the exact `DEV_AUTH_EMAIL` and `DEV_AUTH_PASSWORD` values from `.dev.vars`.
+
+The development password is never committed to GitHub. The server issues a signed `HttpOnly` session cookie after a successful login.
+
+### Temporary Cloudflare deployment
+
+The same `DEV_AUTH_*` variables can be added under the Cloudflare Pages project environment variables for temporary testing. Use private values that are not committed to the repository.
+
+Disable and remove all `DEV_AUTH_*` values before production use:
+
+```text
+DEV_AUTH_ENABLED=false
+```
+
+## Supabase authentication
+
+When the database is ready, configure:
 
 ```text
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-Optional restrictions:
+Optional production restrictions:
 
 ```text
 PAYROLL_ALLOWED_ORIGIN=https://payroll.example.com
@@ -56,23 +102,13 @@ PAYROLL_ALLOWED_EMAIL_DOMAIN=example.com
 PAYROLL_ALLOWED_ROLES=admin,payroll
 ```
 
-When `PAYROLL_ALLOWED_ROLES` is configured, assign authorized roles through trusted server-side Supabase administration using `app_metadata.role`. Do not let users edit their own authorization role.
+When `PAYROLL_ALLOWED_ROLES` is configured, assign authorized roles using trusted server-side Supabase administration through `app_metadata.role`. Users must not be allowed to edit their own authorization role.
 
-## Run locally with authentication
+## Authentication architecture
 
-Install or run Wrangler and start Cloudflare Pages development mode:
+The browser sends credentials to the same-origin `/api/auth/login` Cloudflare Pages Function. In development mode, the function checks private environment variables and issues a signed session cookie. With Supabase configured, the function authenticates against Supabase and stores session tokens in protected cookies.
 
-```bash
-npx wrangler pages dev .
-```
-
-Create a local `.dev.vars` file based on `.dev.vars.example`, then open the URL Wrangler displays and visit:
-
-```text
-/login.html
-```
-
-Opening the dashboard without a valid session redirects back to the login page.
+The dashboard calls `/api/auth/session` before displaying the interface. Passwords and session tokens are not saved in `localStorage`, `sessionStorage`, or source files.
 
 ## Project structure
 
@@ -80,9 +116,9 @@ Opening the dashboard without a valid session redirects back to the login page.
 SL-Paytrack/
 ├── functions/
 │   ├── _lib/
-│   │   └── auth.js              # Cookies, Supabase requests, and access rules
+│   │   └── auth.js              # Cookies, signed dev sessions, and Supabase helpers
 │   └── api/auth/
-│       ├── login.js             # Password authentication endpoint
+│       ├── login.js             # Development or Supabase login endpoint
 │       ├── logout.js            # Session termination endpoint
 │       └── session.js           # Session validation and token refresh
 ├── _headers                     # Cloudflare browser-security headers
@@ -98,17 +134,18 @@ SL-Paytrack/
 
 ## Security boundary
 
-The dashboard guard prevents normal unauthenticated access to the interface, but sensitive payroll data must also be protected at the server and database layers.
+The development account is intended only for interface development and controlled testing. It is not a substitute for a production identity database.
 
-Before connecting real data:
+Before connecting real payroll data:
 
-1. Load payroll records only through authenticated server endpoints.
-2. Enforce role authorization inside every payroll API function.
-3. Enable Supabase Row Level Security for employee and payroll tables.
-4. Keep service-role keys server-side and never expose them to browser code.
-5. Add audit logs for payroll views, edits, approvals, and payment releases.
-6. Add rate limiting, multi-factor authentication, and account recovery controls.
-7. Test authorization using users with different roles before deployment.
+1. Disable development authentication.
+2. Load payroll records only through authenticated server endpoints.
+3. Enforce role authorization inside every payroll API function.
+4. Enable Supabase Row Level Security for employee and payroll tables.
+5. Keep service-role keys server-side and never expose them to browser code.
+6. Add audit logs for payroll views, edits, approvals, and payment releases.
+7. Add rate limiting, multi-factor authentication, and recovery controls.
+8. Test authorization using accounts with different roles.
 
 ## Recommended next phases
 
