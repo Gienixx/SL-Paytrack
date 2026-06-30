@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure sign in for the SL Paytrack payroll management system">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sign in | SL Paytrack</title>
+    <link rel="stylesheet" href="login.css">
+    <script src="login.js" defer></script>
+</head>
+<body>
+    <main class="login-shell">
+        <section class="brand-panel" aria-labelledby="brandTitle">
+            <div class="brand-lockup">
+                <div class="brand-mark" aria-hidden="true">SL</div>
+                <div>
+                    <strong>Paytrack</strong>
+                    <span>Payroll Management</span>
+                </div>
+            </div>
+
+            <div class="brand-content">
+                <p class="eyebrow">Social Loop workforce operations</p>
+                <h1 id="brandTitle">Payroll access built around privacy and control.</h1>
+                <p>Review payroll, attendance, employee records, and approvals from one protected workspace.</p>
+
+                <ul class="security-list" aria-label="Security features">
+                    <li>
+                        <span class="security-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.05 3.41 9.76 8 11 4.59-1.24 8-5.95 8-11V5l-8-3Zm0 2.18L18 6.4V11c0 3.83-2.42 7.59-6 8.76C8.42 18.59 6 14.83 6 11V6.4l6-2.22Zm-1 4.32v2.09L9.29 12.3l1.42 1.41L12 12.41l2.29 2.3 1.42-1.42L13 10.59V8.5h-2Z"/></svg>
+                        </span>
+                        <div>
+                            <strong>Protected sessions</strong>
+                            <span>Authentication is verified before payroll data is displayed.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="security-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V6Zm3 10.73V19h-2v-2.27a2 2 0 1 1 2 0Z"/></svg>
+                        </span>
+                        <div>
+                            <strong>No browser-stored passwords</strong>
+                            <span>Credentials are sent only to the server authentication endpoint.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="security-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2Zm8.94-2.66-1.66-1.29.08-.98a7.54 7.54 0 0 0-.08-.98l1.66-1.29-2-3.46-1.94.78a7.56 7.56 0 0 0-1.7-.98L15 1h-4l-.3 2.14a7.56 7.56 0 0 0-1.7.98l-1.94-.78-2 3.46 1.66 1.29a7.54 7.54 0 0 0-.08.98l.08.98-1.66 1.29 2 3.46L9 14.02a7.56 7.56 0 0 0 1.7.98L11 17.14h4l.3-2.14a7.56 7.56 0 0 0 1.7-.98l1.94.78 2-3.46Z"/></svg>
+                        </span>
+                        <div>
+                            <strong>Role-ready access</strong>
+                            <span>The session response can enforce administrator, payroll, manager, and employee roles.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <p class="brand-footer">Authorized Social Loop personnel only.</p>
+        </section>
+
+        <section class="form-panel" aria-labelledby="loginTitle">
+            <div class="login-card">
+                <div class="mobile-brand">
+                    <div class="brand-mark" aria-hidden="true">SL</div>
+                    <div>
+                        <strong>Paytrack</strong>
+                        <span>Payroll Management</span>
+                    </div>
+                </div>
+
+                <div class="form-heading">
+                    <p class="eyebrow">Secure workspace</p>
+                    <h2 id="loginTitle">Sign in to SL Paytrack</h2>
+                    <p>Use your authorized company account to continue.</p>
+                </div>
+
+                <div class="form-alert" id="formAlert" role="alert" aria-live="polite" hidden></div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-field">
+                        <label for="email">Work email</label>
+                        <div class="input-wrap">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>
+                            <input id="email" name="email" type="email" inputmode="email" autocomplete="username" maxlength="254" placeholder="name@company.com" required>
+                        </div>
+                        <small class="field-error" id="emailError"></small>
+                    </div>
+
+                    <div class="form-field">
+                        <div class="label-row">
+                            <label for="password">Password</label>
+                            <button class="text-link" id="forgotPasswordButton" type="button">Forgot password?</button>
+                        </div>
+                        <div class="input-wrap">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V6Zm3 10.73V19h-2v-2.27a2 2 0 1 1 2 0Z"/></svg>
+                            <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="Enter your password" required>
+                            <button class="password-toggle" id="passwordToggle" type="button" aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5Zm0 12.5a5 5 0 1 1 5-5 5 5 0 0 1-5 5Zm0-8a3 3 0 1 0 3 3 3 3 0 0 0-3-3Z"/></svg>
+                            </button>
+                        </div>
+                        <small class="field-error" id="passwordError"></small>
+                    </div>
+
+                    <label class="checkbox-row">
+                        <input id="rememberMe" name="rememberMe" type="checkbox">
+                        <span>Keep me signed in on this trusted device</span>
+                    </label>
+
+                    <button class="submit-button" id="submitButton" type="submit">
+                        <span>Sign in securely</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5-1.41 1.41L16.17 11H4v2h12.17l-4.58 4.59L13 19l7-7-7-7Z"/></svg>
+                    </button>
+                </form>
+
+                <div class="login-notice">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/></svg>
+                    <p>Access attempts may be logged for payroll security and audit purposes.</p>
+                </div>
+            </div>
+
+            <footer class="form-footer">
+                <span>© 2026 Social Loop</span>
+                <span>Confidential payroll system</span>
+            </footer>
+        </section>
+    </main>
+</body>
+</html>
